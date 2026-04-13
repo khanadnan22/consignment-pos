@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ─── Submission list page (/my/submissions) ───────────────────────── -->
+    <template id="portal_my_submissions" name="My Product Submissions">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Product Submissions</t>
+            </t>
+
+            <div class="container py-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0">My Submissions</h3>
+                    <a href="/my/submissions/new" class="btn btn-primary btn-sm">
+                        + Submit New Product
+                    </a>
+                </div>
+
+                <t t-if="not submissions">
+                    <div class="alert alert-info">
+                        You have not submitted any products yet.
+                        <a href="/my/submissions/new">Submit your first product</a>.
+                    </div>
+                </t>
+
+                <t t-if="submissions">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Price (₹)</th>
+                                    <th>Qty</th>
+                                    <th>Submitted</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="submissions" t-as="s">
+                                    <tr>
+                                        <td>
+                                            <strong><t t-out="s.product_name"/></strong>
+                                        </td>
+                                        <td><t t-out="s.category"/></td>
+                                        <td><t t-out="'%.2f' % s.suggested_price"/></td>
+                                        <td><t t-out="s.quantity"/></td>
+                                        <td>
+                                            <t t-if="s.submitted_date">
+                                                <t t-out="s.submitted_date.strftime('%d %b %Y')"/>
+                                            </t>
+                                            <t t-else="">—</t>
+                                        </td>
+                                        <td>
+                                            <t t-if="s.state == 'draft'">
+                                                <span class="badge bg-secondary">Draft</span>
+                                            </t>
+                                            <t t-elif="s.state == 'submitted'">
+                                                <span class="badge bg-warning text-dark">Under Review</span>
+                                            </t>
+                                            <t t-elif="s.state == 'approved'">
+                                                <span class="badge bg-success">Approved</span>
+                                            </t>
+                                            <t t-elif="s.state == 'rejected'">
+                                                <span class="badge bg-danger"
+                                                      t-att-title="s.rejection_reason or ''">Rejected</span>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                    <t t-call="website.pager">
+                        <t t-set="pager" t-value="pager"/>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- ─── New submission form (/my/submissions/new) ────────────────────── -->
+    <template id="portal_submission_form" name="Submit New Product">
+        <t t-call="portal.portal_layout">
+            <div class="container py-5" style="max-width:720px;">
+                <h3 class="mb-1">Submit a New Product</h3>
+                <p class="text-muted mb-4">
+                    Fill in the details below and submit for admin review.
+                    Once approved, your product will be listed in the store.
+                </p>
+
+                <t t-if="request.params.get('msg') == 'submitted'">
+                    <div class="alert alert-success">
+                        Your product has been submitted successfully and is under review.
+                    </div>
+                </t>
+
+                <form action="/my/submissions/new" method="post"
+                      enctype="multipart/form-data" class="needs-validation">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Product Name *</label>
+                        <input type="text" name="product_name" class="form-control" required="1"
+                               placeholder="e.g. Crimson Silk Lehenga"/>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Category *</label>
+                            <select name="category" class="form-select" required="1">
+                                <option value="">— Select —</option>
+                                <t t-foreach="categories" t-as="cat">
+                                    <option t-att-value="cat[0]"><t t-out="cat[1]"/></option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Suggested Price (₹)</label>
+                            <input type="number" name="suggested_price" class="form-control"
+                                   min="0" step="0.01" placeholder="0.00"/>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Quantity</label>
+                            <input type="number" name="quantity" class="form-control"
+                                   min="1" value="1"/>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description</label>
+                        <textarea name="description" class="form-control" rows="4"
+                                  placeholder="Fabric, craftsmanship, origin story…"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Product Photo</label>
+                        <input type="file" name="image" class="form-control"
+                               accept="image/png,image/jpeg,image/webp"/>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="is_eco_certified"
+                               class="form-check-input" id="eco_check" value="1"/>
+                        <label class="form-check-label" for="eco_check">Eco Certified</label>
+                    </div>
+
+                    <div class="mb-3" id="eco_body_div" style="display:none;">
+                        <label class="form-label">Certification Body</label>
+                        <input type="text" name="eco_certification_body" class="form-control"
+                               placeholder="e.g. GOTS, Oeko-Tex, Khadi Mark"/>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Additional Notes</label>
+                        <textarea name="notes" class="form-control" rows="2"
+                                  placeholder="Any special handling, storage requirements…"></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Submit for Review</button>
+                        <a href="/my/submissions" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+
+                <script>
+                    document.getElementById('eco_check').addEventListener('change', function () {
+                        document.getElementById('eco_body_div').style.display =
+                            this.checked ? 'block' : 'none';
+                    });
+                </script>
+            </div>
+        </t>
+    </template>
+
+</odoo>

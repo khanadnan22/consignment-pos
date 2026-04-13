@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Pivot View -->
+    <record id="view_settlement_pivot" model="ir.ui.view">
+        <field name="name">settlement.record.pivot</field>
+        <field name="model">settlement.record</field>
+        <field name="arch" type="xml">
+            <pivot string="Settlement Analytics" display_quantity="true">
+                <field name="designer_id"      type="row"/>
+                <field name="period_start"     type="col"/>
+                <field name="total_sales"       type="measure"/>
+                <field name="commission_amount" type="measure"/>
+                <field name="payout_amount"     type="measure"/>
+                <field name="total_order_lines" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Bar Graph View -->
+    <record id="view_settlement_graph" model="ir.ui.view">
+        <field name="name">settlement.record.graph</field>
+        <field name="model">settlement.record</field>
+        <field name="arch" type="xml">
+            <graph string="Payout by Designer" type="bar">
+                <field name="designer_id"  type="row"/>
+                <field name="payout_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Analytics Action (graph + pivot + list) -->
+    <record id="action_settlement_analytics" model="ir.actions.act_window">
+        <field name="name">Settlement Analytics</field>
+        <field name="res_model">settlement.record</field>
+        <field name="view_mode">graph,pivot,list</field>
+    </record>
+
+    <menuitem id="menu_settlement_analytics" name="Analytics"
+              parent="menu_consignment_root"
+              action="action_settlement_analytics" sequence="40"/>
+
+</odoo>

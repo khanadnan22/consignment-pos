@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="website_craft_map" name="Craft Region Map">
+        <t t-call="website.layout">
+            <div class="container py-5">
+                <h1 class="mb-1">Indian Craft Region Map</h1>
+                <p class="text-muted mb-4">
+                    Explore the geographic origins of our designer community across India.
+                    Click a pin to see the designers and craft traditions from that region.
+                </p>
+
+                <!-- Leaflet map container -->
+                <div id="craft-map" style="height:520px; border-radius:12px; overflow:hidden; border:1px solid #dee2e6;"></div>
+
+                <!-- Region detail panel (shown on pin click) -->
+                <div id="region-panel" class="mt-4 p-4 d-none"
+                     style="border:1px solid #dee2e6; border-radius:12px; background:#fafafa;">
+                    <h4 id="rp-name" class="mb-1"></h4>
+                    <p class="text-muted mb-2" id="rp-state"></p>
+                    <p id="rp-tradition" class="mb-3"></p>
+                    <h6 class="mb-2">Designers from this region</h6>
+                    <div id="rp-designers"></div>
+                </div>
+
+                <!-- Pass region data as JSON for Leaflet -->
+                <script type="application/json" id="craft-region-data">
+                    [<t t-foreach="regions" t-as="r">
+                        {
+                            "id": <t t-out="r.id"/>,
+                            "name": "<t t-out="r.name.replace('&quot;','&amp;quot;')"/>",
+                            "state": "<t t-out="(r.state or '').replace('&quot;','&amp;quot;')"/>",
+                            "tradition": "<t t-out="(r.craft_tradition or '').replace('&quot;','&amp;quot;').replace('\n',' ')"/>",
+                            "lat": <t t-out="r.latitude"/>,
+                            "lng": <t t-out="r.longitude"/>,
+                            "designer_count": <t t-out="r.designer_count"/>
+                        }<t t-if="not r_last">,</t>
+                    </t>]
+                </script>
+            </div>
+
+            <!-- Leaflet CSS + JS -->
+            <link rel="stylesheet"
+                  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+            <script>
+                (function () {
+                    var rawData = document.getElementById('craft-region-data').textContent;
+                    var regions = JSON.parse(rawData);
+
+                    var map = L.map('craft-map').setView([22.5, 80.0], 5);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors',
+                        maxZoom: 18,
+                    }).addTo(map);
+
+                    var panel     = document.getElementById('region-panel');
+                    var rpName    = document.getElementById('rp-name');
+                    var rpState   = document.getElementById('rp-state');
+                    var rpTrad    = document.getElementById('rp-tradition');
+                    var rpDesign  = document.getElementById('rp-designers');
+
+                    regions.forEach(function (r) {
+                        if (!r.lat || !r.lng) return;
+
+                        var marker = L.circleMarker([r.lat, r.lng], {
+                            radius:      r.designer_count > 0 ? 10 + r.designer_count * 2 : 10,
+                            fillColor:   '#1D9E75',
+                            color:       '#0F6E56',
+                            weight:      2,
+                            opacity:     1,
+                            fillOpacity: 0.75,
+                        }).addTo(map);
+
+                        marker.bindTooltip(r.name + ' (' + r.designer_count + ' designer' +
+                            (r.designer_count !== 1 ? 's' : '') + ')', {sticky: true});
+
+                        marker.on('click', function () {
+                            rpName.textContent   = r.name;
+                            rpState.textContent  = r.state || '';
+                            rpTrad.textContent   = r.tradition || 'No tradition description available.';
+                            rpDesign.innerHTML   = '<em class="text-muted">Loading designers…</em>';
+                            panel.classList.remove('d-none');
+                            panel.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+
+                            fetch('/craft-map/region/' + r.id, {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({jsonrpc:'2.0',method:'call',params:{}}),
+                            })
+                            .then(function (res) { return res.json(); })
+                            .then(function (data) {
+                                var designers = (data.result || {}).designers || [];
+                                if (!designers.length) {
+                                    rpDesign.innerHTML = '<p class="text-muted">No designers linked to this region yet.</p>';
+                                    return;
+                                }
+                                rpDesign.innerHTML = designers.map(function (d) {
+                                    var link = d.published
+                                        ? '<a href="/designers/' + d.id + '">' + d.name + '</a>'
+                                        : '<span>' + d.name + '</span>';
+                                    return '<div class="mb-1">' + link +
+                                        (d.specialty ? ' <small class="text-muted">— ' + d.specialty + '</small>' : '') +
+                                        '</div>';
+                                }).join('');
+                            })
+                            .catch(function () {
+                                rpDesign.innerHTML = '<p class="text-danger">Could not load designer info.</p>';
+                            });
+                        });
+                    });
+                })();
+            </script>
+        </t>
+    </template>
+
+</odoo>

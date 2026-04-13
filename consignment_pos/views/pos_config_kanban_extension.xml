@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add global consignment metrics to the native POS kanban view -->
+    <record id="view_pos_config_kanban_consignment" model="ir.ui.view">
+        <field name="name">pos.config.kanban.consignment</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_config_kanban"/>
+        <field name="arch" type="xml">
+            <!-- Append the metrics inside the main Kanban card container -->
+            <xpath expr="//t[@t-name='card']" position="inside">
+                <div class="mt-3 pt-2" style="border-top: 1px dashed #ced4da; background-color: #f8f9fa; padding: 10px; border-radius: 6px;">
+                    <div style="font-size: 11px; font-weight: 800; color: #1E2761; text-transform: uppercase; margin-bottom: 8px;">
+                        <i class="fa fa-briefcase me-1"/> Consignment Overview
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-1" style="font-size: 12px;">
+                        <span>
+                            <i class="fa fa-file-text-o text-warning me-1"/> 
+                            <field name="consignment_draft_settlements"/> Pending Set.
+                        </span>
+                        <span>
+                            <i class="fa fa-money text-danger me-1"/> 
+                            <field name="consignment_pending_amount" widget="monetary"/> Unpaid
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between" style="font-size: 12px;">
+                        <span>
+                            <i class="fa fa-exclamation-triangle text-info me-1"/> 
+                            <field name="consignment_low_stock"/> Low Stock
+                        </span>
+                        <span>
+                            <i class="fa fa-users text-success me-1"/> 
+                            <field name="consignment_active_designers"/> Designers
+                        </span>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

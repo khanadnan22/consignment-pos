@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_designer_summary" model="ir.actions.report">
+        <field name="name">Designer Monthly/Annual Summary</field>
+        <field name="model">settlement.record</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">consignment_pos.report_designer_summary_document</field>
+        <field name="report_file">consignment_pos.report_designer_summary_document</field>
+        <field name="binding_model_id" ref="model_settlement_record"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_designer_summary_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- Header -->
+                        <div style="background:#1E2761;color:#fff;padding:20px;
+                                    border-radius:6px;margin-bottom:24px;">
+                            <h2 style="margin:0;font-size:1.4rem;">
+                                Designer Settlement Summary
+                            </h2>
+                            <div style="opacity:0.85;margin-top:6px;font-size:0.95rem;">
+                                <t t-esc="doc.designer_id.name"/> —
+                                <t t-esc="doc.period_start"/> to <t t-esc="doc.period_end"/>
+                            </div>
+                        </div>
+
+                        <!-- Designer Info -->
+                        <table class="table table-sm table-bordered" style="margin-bottom:20px;">
+                            <tr>
+                                <td style="width:30%;background:#f8f9fa;"><b>Designer</b></td>
+                                <td><t t-esc="doc.designer_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td style="background:#f8f9fa;"><b>Email</b></td>
+                                <td><t t-esc="doc.designer_id.email or 'N/A'"/></td>
+                            </tr>
+                            <tr>
+                                <td style="background:#f8f9fa;"><b>Period</b></td>
+                                <td>
+                                    <t t-esc="doc.period_start"/> to
+                                    <t t-esc="doc.period_end"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="background:#f8f9fa;"><b>Status</b></td>
+                                <td>
+                                    <span t-attf-style="font-weight:bold;color:{{
+                                        '#166534' if doc.state == 'paid' else
+                                        '#1E2761' if doc.state == 'posted' else '#6B7280'
+                                    }};">
+                                        <t t-esc="doc.state.upper()"/>
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Channel Breakdown -->
+                        <h4 style="color:#1E2761;margin-bottom:12px;">
+                            Sales Channel Breakdown
+                        </h4>
+                        <table class="table table-bordered" style="margin-bottom:24px;">
+                            <thead>
+                                <tr style="background:#1E2761;color:#fff;">
+                                    <th>Channel</th>
+                                    <th class="text-right">Sales</th>
+                                    <th class="text-right">Commission</th>
+                                    <th class="text-right">Payout</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>🖥️ In-Store (POS)</td>
+                                    <td class="text-right">
+                                        <t t-esc="doc.pos_sales"
+                                           t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="doc.pos_sales - doc.pos_payout"
+                                           t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="doc.pos_payout"
+                                           t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>🌐 Online (Website)</td>
+                                    <td class="text-right">
+                                        <t t-esc="doc.online_sales"
+                                           t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="doc.online_sales - doc.online_payout"
+                                           t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="doc.online_payout"
+                                           t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr style="font-weight:bold;background:#f0fdf4;">
+                                    <td>TOTAL (Both Channels)</td>
+                                    <td class="text-right">
+                                        <t t-esc="doc.total_sales"
+                                           t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td>
+                                    <td class="text-right" style="color:#991B1B;">
+                                        <t t-esc="doc.commission_amount"
+                                           t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td>
+                                    <td class="text-right" style="color:#166534;font-size:1.1rem;">
+                                        <t t-esc="doc.payout_amount"
+                                           t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Summary Stats -->
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td style="background:#f8f9fa;"><b>Total Order Lines</b></td>
+                                <td><t t-esc="doc.total_order_lines"/> consignment items sold</td>
+                            </tr>
+                            <tr>
+                                <td style="background:#f8f9fa;"><b>Vendor Bill</b></td>
+                                <td><t t-esc="doc.move_id.name if doc.move_id else 'Not yet created'"/></td>
+                            </tr>
+                        </table>
+
+                        <!-- Signature block -->
+                        <div style="margin-top:48px;display:flex;justify-content:space-between;">
+                            <div>
+                                <div style="border-top:1px solid #000;
+                                            width:200px;padding-top:6px;">
+                                    Store Manager Signature
+                                </div>
+                            </div>
+                            <div>
+                                <div style="border-top:1px solid #000;
+                                            width:200px;padding-top:6px;">
+                                    Designer Acknowledgement
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

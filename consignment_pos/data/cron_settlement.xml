@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="cron_generate_weekly_settlement" model="ir.cron">
+        <field name="name">Consignment: Generate Weekly Settlements</field>
+        <field name="model_id" ref="model_settlement_record"/>
+        <field name="state">code</field>
+        <field name="code">model.generate_settlement()</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">weeks</field>
+        <field name="active">True</field>
+    </record>
+
+</odoo>

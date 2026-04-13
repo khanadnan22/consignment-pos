@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ─── Commission Tier inline view (inside commission.config form) ─────── -->
+    <record id="view_commission_tier_tree" model="ir.ui.view">
+        <field name="name">commission.tier.tree</field>
+        <field name="model">commission.tier</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="label" placeholder="e.g. Gold"/>
+                <field name="min_sales_amount"/>
+                <field name="tier_percentage"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ─── Commission Config form (updated with tier tab) ───────────────────── -->
+    <record id="view_commission_config_form_v2" model="ir.ui.view">
+        <field name="name">commission.config.form.v2</field>
+        <field name="model">commission.config</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <form string="Commission Configuration">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="designer_id"/>
+                            <field name="commission_percentage" string="Base Commission (%)"/>
+                            <field name="settlement_period"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="use_tiered"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Volume Tiers" invisible="use_tiered == False">
+                            <p class="text-muted">
+                                Define sales thresholds. When the designer's cumulative sales
+                                cross a threshold, the lower commission rate applies.
+                                Tiers are evaluated highest-to-lowest — the best applicable rate wins.
+                            </p>
+                            <field name="tier_ids" widget="one2many_list"
+                                   view_id="%(view_commission_tier_tree)d"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" placeholder="Internal notes…"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ─── Product Submission list view ─────────────────────────────────────── -->
+    <record id="view_product_submission_list" model="ir.ui.view">
+        <field name="name">product.submission.list</field>
+        <field name="model">product.submission</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state=='approved'"
+                  decoration-danger="state=='rejected'"
+                  decoration-warning="state=='submitted'">
+                <field name="create_date" string="Date"/>
+                <field name="designer_id"/>
+                <field name="product_name"/>
+                <field name="category"/>
+                <field name="suggested_price"/>
+                <field name="quantity"/>
+                <field name="state" widget="badge"
+                       decoration-success="state=='approved'"
+                       decoration-danger="state=='rejected'"
+                       decoration-warning="state=='submitted'"
+                       decoration-info="state=='draft'"/>
+                <field name="product_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ─── Product Submission form view ─────────────────────────────────────── -->
+    <record id="view_product_submission_form" model="ir.ui.view">
+        <field name="name">product.submission.form</field>
+        <field name="model">product.submission</field>
+        <field name="arch" type="xml">
+            <form string="Product Submission">
+                <header>
+                    <button name="action_submit" string="Submit for Review" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve &amp; Create Product" type="object"
+                            class="btn-success" invisible="state != 'submitted'"
+                            groups="base.group_system"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            class="btn-danger" invisible="state != 'submitted'"
+                            groups="base.group_system"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <field name="image" widget="image" class="oe_avatar"
+                           readonly="state != 'draft'"/>
+                    <group>
+                        <group>
+                            <field name="designer_id" readonly="state != 'draft'"/>
+                            <field name="product_name" readonly="state != 'draft'"/>
+                            <field name="category" readonly="state != 'draft'"/>
+                            <field name="suggested_price" readonly="state != 'draft'"/>
+                            <field name="quantity" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="is_eco_certified"/>
+                            <field name="eco_certification_body"
+                                   invisible="is_eco_certified == False"/>
+                            <field name="submitted_date" readonly="1"/>
+                            <field name="reviewed_by" readonly="1"/>
+                            <field name="product_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"
+                               readonly="state != 'draft'"/>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                    <group string="Rejection Reason"
+                           invisible="state != 'rejected'">
+                        <field name="rejection_reason" nolabel="1" readonly="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ─── Product Submission action ────────────────────────────────────────── -->
+    <record id="action_product_submission" model="ir.actions.act_window">
+        <field name="name">Product Submissions</field>
+        <field name="res_model">product.submission</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_submitted': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Submit a new Product for Consignment!
+            </p>
+            <p>
+                Click "New" to create a new product submission. Designers can also submit products through the web portal.
+            </p>
+        </field>
+    </record>
+
+    <!-- Default search filter: show submitted first -->
+    <record id="view_product_submission_search" model="ir.ui.view">
+        <field name="name">product.submission.search</field>
+        <field name="model">product.submission</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="designer_id"/>
+                <field name="product_name"/>
+                <filter name="submitted" string="Pending Review"
+                        domain="[('state','=','submitted')]"/>
+                <filter name="approved" string="Approved"
+                        domain="[('state','=','approved')]"/>
+                <filter name="rejected" string="Rejected"
+                        domain="[('state','=','rejected')]"/>
+                <group>
+                    <filter name="by_designer" string="Designer"
+                            context="{'group_by':'designer_id'}"/>
+                    <filter name="by_state" string="Status"
+                            context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ─── Settlement dispute wizard views ──────────────────────────────────── -->
+    <record id="view_settlement_dispute_wizard_form" model="ir.ui.view">
+        <field name="name">settlement.dispute.wizard.form</field>
+        <field name="model">settlement.dispute.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Raise Dispute">
+                <group>
+                    <field name="settlement_id" readonly="1"/>
+                    <field name="dispute_reason" placeholder="Describe what you believe is incorrect…"/>
+                </group>
+                <footer>
+                    <button name="action_confirm_dispute" string="Submit Dispute"
+                            type="object" class="btn-warning"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_settlement_dispute_resolve_wizard_form" model="ir.ui.view">
+        <field name="name">settlement.dispute.resolve.wizard.form</field>
+        <field name="model">settlement.dispute.resolve.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Resolve Dispute">
+                <group>
+                    <field name="settlement_id" readonly="1"/>
+                    <field name="recalculate"/>
+                    <field name="dispute_response" placeholder="Explain what was checked and the outcome…"/>
+                </group>
+                <footer>
+                    <button name="action_resolve" string="Resolve &amp; Reinstate"
+                            type="object" class="btn-success"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ─── Product submission reject wizard view ─────────────────────────────── -->
+    <record id="view_product_submission_reject_wizard_form" model="ir.ui.view">
+        <field name="name">product.submission.reject.wizard.form</field>
+        <field name="model">product.submission.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reject Submission">
+                <group>
+                    <field name="submission_id" readonly="1"/>
+                    <field name="rejection_reason" placeholder="Explain why this submission is being rejected…"/>
+                </group>
+                <footer>
+                    <button name="action_confirm_reject" string="Confirm Rejection"
+                            type="object" class="btn-danger"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ─── Menu entry for product submissions ───────────────────────────────── -->
+    <menuitem id="menu_product_submissions"
+              name="Product Submissions"
+              parent="point_of_sale.menu_point_root"
+              action="action_product_submission"
+              sequence="25"/>
+
+</odoo>

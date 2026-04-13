@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_consignor_form" model="ir.ui.view">
+        <field name="name">res.partner.consignor.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_settlements" type="object"
+                        class="oe_stat_button" icon="fa-money"
+                        invisible="not is_consignor">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value text-success">
+                            <field name="unpaid_commission" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </span>
+                        <span class="o_stat_text">Unpaid</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Consignment" invisible="not is_consignor">
+                    <group string="Consignor Settings">
+                        <field name="is_consignor"/>
+                        <field name="commission_rate"/>
+                        <field name="monthly_gallery_fee" widget="monetary" invisible="not is_consignor"/>
+                        <field name="consignment_date"/>
+                    </group>
+                    <group string="Website Profile">
+                        <field name="website_published" widget="boolean_toggle"/>
+                        <field name="designer_specialty"/>
+                        <field name="website_product_count" readonly="1"/>
+                    </group>
+                    <group string="Bio (shown on website)">
+                        <field name="website_description" nolabel="1"/>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <div class="alert alert-info" role="alert" invisible="not is_consignor"
+                     style="margin-top:8px;">
+                    This partner is a registered <strong>Consignor / Designer</strong>.
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_consignor_list" model="ir.actions.act_window">
+        <field name="name">Designers / Consignors</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_consignor','=',True)]</field>
+        <field name="context">{'default_is_consignor': True}</field>
+    </record>
+
+    <!-- Root menu defined here so it is always available first -->
+    <menuitem id="menu_consignment_root" name="Consignment" parent="point_of_sale.menu_point_root" sequence="99"/>
+    <menuitem id="menu_consignors" name="Designers"
+              parent="menu_consignment_root"
+              action="action_consignor_list" sequence="10"/>
+
+</odoo>

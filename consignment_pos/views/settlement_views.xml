@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_settlement_record_form" model="ir.ui.view">
+        <field name="name">settlement.record.form</field>
+        <field name="model">settlement.record</field>
+        <field name="arch" type="xml">
+            <form string="Settlement Record">
+                <header>
+                    <button name="action_post" type="object" string="Post Settlement"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_mark_paid" type="object" string="Mark as Paid"
+                            invisible="state != 'posted'" class="btn-success"/>
+                    <button name="action_dispute" type="object" string="Raise Dispute"
+                            invisible="state != 'posted'" class="btn-warning"/>
+                    <button name="action_resolve_dispute" type="object" string="Resolve Dispute"
+                            invisible="state != 'disputed'" class="btn-success"
+                            groups="base.group_system"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state not in ('posted','disputed')" class="btn-secondary"/>
+                    <button name="action_recalculate" type="object" string="Recalculate"
+                            invisible="state == 'paid'" class="btn-secondary"/>
+                    <button name="action_send_email" type="object"
+                            string="Send Email to Designer"
+                            invisible="state == 'draft'" class="btn-info"/>
+                    <button name="action_print_summary" type="object"
+                            string="Print Summary PDF" class="btn-secondary"/>
+                    <button name="action_view_bill" type="object" string="View Vendor Bill"
+                            invisible="not move_id" class="btn-info"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,posted,disputed,paid"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not has_negative_payout">
+                        <strong>Warning:</strong> Refunds exceeded sales — negative payout.
+                        Review before posting.
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="state != 'disputed'">
+                        <strong>Dispute Active:</strong> <field name="dispute_reason" readonly="1" nolabel="1"/>
+                    </div>
+                    <group>
+                        <group string="Designer">
+                            <field name="designer_id"/>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                            <field name="total_order_lines" readonly="1"/>
+                            <field name="portal_published" widget="boolean_toggle"/>
+                        </group>
+                        <group string="Totals (All Channels)">
+                            <field name="total_sales"       widget="monetary"/>
+                            <field name="commission_amount" widget="monetary"/>
+                            <field name="gallery_fee_deduction" widget="monetary" invisible="gallery_fee_deduction == 0"/>
+                            <field name="payout_amount"     widget="monetary"/>
+                            <field name="has_negative_payout" invisible="1"/>
+                        </group>
+                    </group>
+                    <!-- Week 9: Channel Breakdown -->
+                    <group string="Channel Breakdown">
+                        <group string="🖥️ In-Store (POS)">
+                            <field name="pos_sales"   widget="monetary"/>
+                            <field name="pos_payout"  widget="monetary"/>
+                        </group>
+                        <group string="🌐 Online (Website)">
+                            <field name="online_sales"   widget="monetary"/>
+                            <field name="online_payout"  widget="monetary"/>
+                        </group>
+                    </group>
+                    <group string="Accounting">
+                        <field name="move_id" readonly="1"/>
+                    </group>
+                    <field name="note" placeholder="Notes..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_settlement_record_list" model="ir.ui.view">
+        <field name="name">settlement.record.list</field>
+        <field name="model">settlement.record</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'paid'"
+                  decoration-info="state == 'posted'"
+                  decoration-danger="state == 'disputed'"
+                  decoration-muted="state == 'draft'"
+                  decoration-warning="has_negative_payout">
+                <field name="designer_id"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="pos_sales"         widget="monetary" optional="show"/>
+                <field name="online_sales"      widget="monetary" optional="show"/>
+                <field name="total_sales"       widget="monetary"/>
+                <field name="commission_amount" widget="monetary"/>
+                <field name="payout_amount"     widget="monetary"/>
+                <field name="total_order_lines"/>
+                <field name="has_negative_payout" string="Neg.Payout" optional="show"/>
+                <field name="portal_published"  optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'paid'"
+                       decoration-info="state == 'posted'"
+                       decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_settlement_record_graph" model="ir.ui.view">
+        <field name="name">settlement.record.graph</field>
+        <field name="model">settlement.record</field>
+        <field name="arch" type="xml">
+            <graph string="Settlement Analysis" type="bar">
+                <field name="designer_id"/>
+                <field name="payout_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_settlement_record_pivot" model="ir.ui.view">
+        <field name="name">settlement.record.pivot</field>
+        <field name="model">settlement.record</field>
+        <field name="arch" type="xml">
+            <pivot string="Settlement Pivot" sample="1">
+                <field name="designer_id" type="row"/>
+                <field name="period_start" type="col" interval="month"/>
+                <field name="total_sales" type="measure"/>
+                <field name="commission_amount" type="measure"/>
+                <field name="payout_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_settlement_record" model="ir.actions.act_window">
+        <field name="name">Settlements</field>
+        <field name="res_model">settlement.record</field>
+        <field name="view_mode">list,form,graph,pivot</field>
+    </record>
+
+    <menuitem id="menu_settlements" name="Settlements"
+              parent="menu_consignment_root"
+              action="action_settlement_record" sequence="20"/>
+</odoo>

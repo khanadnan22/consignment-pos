@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Designer Info Box — injected after the add-to-cart button group.
+        Uses t-inherit-mode="extension" with active="False" as safety fallback.
+        XPath targets the first <section> inside the product page wrapper,
+        which is present in every website_sale version as the outermost content block.
+    -->
+    <template id="product_designer_info_box"
+              inherit_id="website_sale.product"
+              name="Consignment Designer Box"
+              active="False">
+        <xpath expr="//t[@t-call='website_sale.product_detail']" position="after">
+<t t-set="is_consignment"
+               t-value="product.is_consignment and product.designer_id"/>
+            <t t-if="is_consignment">
+                <div class="container" style="margin-top:24px;margin-bottom:8px;">
+                    <div style="background:#F8F9FF;border:1px solid #E0E7FF;
+                                border-radius:12px;padding:20px;">
+
+                        <div style="font-size:0.75rem;text-transform:uppercase;
+                                    letter-spacing:0.8px;color:#6B7280;
+                                    font-weight:600;margin-bottom:12px;">
+                            Consignment Piece
+                        </div>
+
+                        <div style="display:flex;align-items:center;gap:16px;">
+                            <!-- Designer Avatar -->
+                            <div style="width:52px;height:52px;border-radius:50%;
+                                        background:#1E2761;color:#fff;
+                                        display:flex;align-items:center;
+                                        justify-content:center;
+                                        font-size:1.4rem;font-weight:700;flex-shrink:0;">
+                                <t t-esc="product.designer_id.name[0].upper()"/>
+                            </div>
+
+                            <!-- Designer Info -->
+                            <div style="flex:1;">
+                                <div style="font-size:0.78rem;color:#6B7280;">
+                                    Sold by
+                                </div>
+                                <div style="font-weight:700;color:#1E2761;font-size:1rem;">
+                                    <t t-esc="product.designer_id.name"/>
+                                </div>
+                                <t t-if="product.designer_id.designer_specialty">
+                                    <div style="font-size:0.82rem;color:#6B7280;margin-top:2px;">
+                                        <t t-esc="product.designer_id.designer_specialty"/>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- View Profile Link -->
+                            <t t-if="product.designer_id.website_published">
+                                <a t-attf-href="/designers/{{ product.designer_id.id }}"
+                                   style="background:#1E2761;color:#fff;padding:8px 18px;
+                                          border-radius:20px;text-decoration:none;
+                                          font-size:0.82rem;font-weight:600;white-space:nowrap;">
+                                    View Profile →
+                                </a>
+                            </t>
+                        </div>
+
+                        <!-- Category chip -->
+                        <t t-if="product.consignment_category">
+                            <div style="margin-top:12px;">
+                                <span style="background:#EEF3FF;color:#1E2761;
+                                             font-size:0.75rem;padding:3px 12px;
+                                             border-radius:20px;font-weight:600;">
+                                    <t t-esc="product.consignment_category"/>
+                                </span>
+                            </div>
+                        </t>
+
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

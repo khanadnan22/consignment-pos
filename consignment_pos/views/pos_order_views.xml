@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pos_order_tree_inherit_consignment" model="ir.ui.view">
+        <field name="name">pos.order.tree.inherit.consignment</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="has_consignment" optional="show" widget="boolean_toggle" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="view_pos_pos_form_inherit_consignment" model="ir.ui.view">
+        <field name="name">pos.order.form.inherit.consignment</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='lines']/list/field[@name='price_subtotal']" position="after">
+                <field name="is_consignment_line" column_invisible="1"/>
+                <field name="designer_id" optional="show" readonly="1" invisible="not is_consignment_line"/>
+                <field name="payout_line_amount" optional="show" readonly="1" invisible="not is_consignment_line"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
