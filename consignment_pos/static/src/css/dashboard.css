@@ -1,0 +1,19 @@
+/* Consignment Dashboard — Backend Styles (Week 9) */
+.consignment-kpi-card {
+    border-radius: 12px;
+    padding: 20px;
+    transition: box-shadow 0.2s;
+}
+.consignment-kpi-card:hover {
+    box-shadow: 0 4px 16px rgba(30,39,97,0.15);
+}
+.consignment-kpi-value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+.consignment-kpi-label {
+    font-size: 0.85rem;
+    color: #6B7280;
+    margin-top: 4px;
+}

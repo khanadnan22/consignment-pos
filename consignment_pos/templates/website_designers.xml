@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DESIGNERS LIST PAGE  —  /designers
+     ═══════════════════════════════════════════════════════════════════════ -->
+<template id="website_designers_list" name="All Designers">
+    <t t-call="website.layout">
+        <div id="wrap">
+
+            <!-- Page Header -->
+            <div style="background:linear-gradient(135deg,#1E2761 0%,#408EC6 100%);
+                        padding:60px 0;text-align:center;color:#fff;">
+                <div class="container">
+                    <h1 style="font-weight:800;font-size:2.5rem;">Our Designers</h1>
+                    <p style="font-size:1.1rem;opacity:0.9;margin-top:12px;">
+                        Discover the independent designers behind our consignment collection
+                    </p>
+                </div>
+            </div>
+
+            <!-- Designers Grid -->
+            <div class="container py-5">
+                <div class="row">
+                    <t t-foreach="designers" t-as="d">
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <a t-attf-href="/designers/{{ d.id }}"
+                               style="text-decoration:none;color:inherit;">
+                                <div style="background:#fff;border-radius:16px;overflow:hidden;
+                                            box-shadow:0 4px 16px rgba(0,0,0,0.08);
+                                            transition:transform 0.2s,box-shadow 0.2s;
+                                            height:100%;">
+
+                                    <!-- Designer Header Banner -->
+                                    <div style="background:linear-gradient(135deg,#1E2761,#408EC6);
+                                                padding:32px 24px;text-align:center;">
+                                        <!-- Avatar Initial/Photo -->
+                                        <t t-if="d.image_512">
+                                            <img t-attf-src="/web/image/res.partner/{{ d.id }}/image_512" 
+                                                 style="width:80px;height:80px;border-radius:50%;
+                                                        object-fit:cover;border:3px solid rgba(255,255,255,0.5);
+                                                        margin:0 auto 12px;" 
+                                                 t-att-alt="d.name"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div style="width:80px;height:80px;border-radius:50%;
+                                                        background:rgba(255,255,255,0.2);
+                                                        border:3px solid rgba(255,255,255,0.5);
+                                                        display:flex;align-items:center;
+                                                        justify-content:center;
+                                                        font-size:2rem;font-weight:700;color:#fff;
+                                                        margin:0 auto 12px;">
+                                                <t t-esc="d.name[0].upper()"/>
+                                            </div>
+                                        </t>
+                                        <h4 style="color:#fff;font-weight:700;margin:0;">
+                                            <t t-esc="d.name"/>
+                                        </h4>
+                                        <t t-if="d.designer_specialty">
+                                            <div style="color:rgba(255,255,255,0.8);
+                                                        font-size:0.85rem;margin-top:6px;">
+                                                <t t-esc="d.designer_specialty"/>
+                                            </div>
+                                        </t>
+                                    </div>
+
+                                    <!-- Designer Info -->
+                                    <div style="padding:20px 24px;">
+                                        <t t-if="d.website_description">
+                                            <div style="color:#6B7280;font-size:0.88rem;
+                                                        line-height:1.6;margin-bottom:14px;
+                                                        display:-webkit-box;
+                                                        -webkit-line-clamp:3;
+                                                        -webkit-box-orient:vertical;
+                                                        overflow:hidden;">
+                                                <t t-raw="d.website_description"/>
+                                            </div>
+                                        </t>
+
+                                        <div style="display:flex;justify-content:space-between;
+                                                    align-items:center;">
+                                            <span style="background:#EEF3FF;color:#1E2761;
+                                                         padding:4px 12px;border-radius:20px;
+                                                         font-size:0.8rem;font-weight:600;">
+                                                <t t-esc="d.website_product_count"/> items
+                                            </span>
+                                            <span style="color:#1E2761;font-weight:600;
+                                                         font-size:0.88rem;">
+                                                View Collection →
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </a>
+                        </div>
+                    </t>
+
+                    <t t-if="not designers">
+                        <div class="col-12 text-center py-5">
+                            <div style="font-size:3rem;">👗</div>
+                            <h5 style="color:#6B7280;margin-top:16px;">
+                                No designer profiles published yet.
+                            </h5>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+        </div>
+    </t>
+</template>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     INDIVIDUAL DESIGNER PROFILE PAGE  —  /designers/<id>
+     ═══════════════════════════════════════════════════════════════════════ -->
+<template id="website_designer_profile" name="Designer Profile">
+    <t t-call="website.layout">
+        <div id="wrap">
+
+            <!-- Designer Hero Section -->
+            <div style="background:linear-gradient(135deg,#1E2761 0%,#408EC6 100%);
+                        padding:60px 0;color:#fff;">
+                <div class="container">
+                    <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;">
+
+                        <!-- Avatar/Photo -->
+                        <t t-if="designer.image_512">
+                            <img t-attf-src="/web/image/res.partner/{{ designer.id }}/image_512" 
+                                 style="width:100px;height:100px;border-radius:50%;
+                                        object-fit:cover;border:3px solid rgba(255,255,255,0.5);
+                                        flex-shrink:0;" 
+                                 t-att-alt="designer.name"/>
+                        </t>
+                        <t t-else="">
+                            <div style="width:100px;height:100px;border-radius:50%;
+                                        background:rgba(255,255,255,0.2);
+                                        border:3px solid rgba(255,255,255,0.5);
+                                        display:flex;align-items:center;justify-content:center;
+                                        font-size:2.5rem;font-weight:700;flex-shrink:0;">
+                                <t t-esc="designer.name[0].upper()"/>
+                            </div>
+                        </t>
+
+                        <!-- Info -->
+                        <div>
+                            <div style="font-size:0.85rem;opacity:0.75;margin-bottom:4px;">
+                                <a href="/designers" style="color:rgba(255,255,255,0.75);
+                                                            text-decoration:none;">
+                                    ← All Designers
+                                </a>
+                            </div>
+                            <h1 style="font-weight:800;font-size:2.2rem;margin:0;">
+                                <t t-esc="designer.name"/>
+                            </h1>
+                            <t t-if="designer.designer_specialty">
+                                <div style="font-size:1rem;opacity:0.85;margin-top:8px;">
+                                    <t t-esc="designer.designer_specialty"/>
+                                </div>
+                            </t>
+                            <div style="margin-top:12px;">
+                                <span style="background:rgba(255,255,255,0.2);
+                                             padding:4px 14px;border-radius:20px;
+                                             font-size:0.85rem;">
+                                    <t t-esc="designer.website_product_count"/> items available
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bio -->
+                    <t t-if="designer.website_description">
+                        <div style="margin-top:28px;max-width:720px;
+                                    font-size:0.95rem;line-height:1.7;opacity:0.9;">
+                            <t t-raw="designer.website_description"/>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <div class="container py-5">
+
+                <!-- Category Filter Tabs -->
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;">
+                    <a t-attf-href="/designers/{{ designer.id }}"
+                       t-attf-style="padding:8px 20px;border-radius:24px;
+                                     text-decoration:none;font-size:0.88rem;font-weight:600;
+                                     background:{{ '#1E2761' if not selected_category else '#f3f4f6' }};
+                                     color:{{ '#fff' if not selected_category else '#374151' }};">
+                        All
+                    </a>
+                    <t t-foreach="categories" t-as="cat">
+                        <a t-attf-href="/designers/{{ designer.id }}?category={{ cat[0] }}"
+                           t-attf-style="padding:8px 20px;border-radius:24px;
+                                         text-decoration:none;font-size:0.88rem;font-weight:600;
+                                         background:{{ '#1E2761' if selected_category == cat[0] else '#f3f4f6' }};
+                                         color:{{ '#fff' if selected_category == cat[0] else '#374151' }};">
+                            <t t-esc="cat[1]"/>
+                        </a>
+                    </t>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="row">
+                    <t t-foreach="products" t-as="p">
+                        <div class="col-lg-3 col-md-4 col-6 mb-4">
+                            <a t-attf-href="/shop/{{ p.id }}"
+                               style="text-decoration:none;color:inherit;">
+                                <div class="consignment-card">
+                                    <!-- Product Image -->
+                                    <div style="position:relative;">
+                                        <t t-if="p.image_512">
+                                            <img t-attf-src="/web/image/product.template/{{ p.id }}/image_512"
+                                                 style="width:100%;height:220px;object-fit:cover;"
+                                                 t-att-alt="p.name"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div style="width:100%;height:220px;
+                                                        background:#f3f4f6;
+                                                        display:flex;align-items:center;
+                                                        justify-content:center;font-size:3rem;">
+                                                👗
+                                            </div>
+                                        </t>
+                                        <!-- Category chip -->
+                                        <t t-if="p.consignment_category">
+                                            <span style="position:absolute;top:10px;left:10px;
+                                                         background:rgba(30,39,97,0.85);
+                                                         color:#fff;font-size:0.68rem;
+                                                         padding:3px 9px;border-radius:20px;">
+                                                <t t-esc="p.consignment_category"/>
+                                            </span>
+                                        </t>
+                                    </div>
+                                    <!-- Product Info -->
+                                    <div style="padding:14px;">
+                                        <div style="font-weight:600;font-size:0.92rem;
+                                                    color:#111827;">
+                                            <t t-esc="p.name"/>
+                                        </div>
+                                        <div style="display:flex;justify-content:space-between;
+                                                    align-items:center;margin-top:8px;">
+                                            <span style="font-weight:700;color:#1E2761;">
+                                                <t t-esc="p.list_price"
+                                                   t-options='{"widget":"monetary","display_currency":p.currency_id}'/>
+                                            </span>
+                                            <span style="background:#1E2761;color:#fff;
+                                                         padding:5px 14px;border-radius:16px;
+                                                         font-size:0.78rem;font-weight:600;">
+                                                View
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </t>
+
+                    <t t-if="not products">
+                        <div class="col-12 text-center py-5">
+                            <h5 style="color:#6B7280;">
+                                No products found in this category.
+                            </h5>
+                        </div>
+                    </t>
+                </div>
+
+            </div>
+        </div>
+    </t>
+</template>
+
+</odoo>

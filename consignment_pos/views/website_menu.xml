@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Week 8: Website Menu Items.
+        Adds "Consignment Shop" and "Designers" links to the public website navigation.
+    -->
+    <record id="website_menu_consignment_shop" model="website.menu">
+        <field name="name">Consignment Shop</field>
+        <field name="url">/consignment/shop</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">50</field>
+    </record>
+
+    <record id="website_menu_designers" model="website.menu">
+        <field name="name">Designers</field>
+        <field name="url">/designers</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">55</field>
+    </record>
+
+    <record id="website_menu_craft_map" model="website.menu">
+        <field name="name">Craft Map</field>
+        <field name="url">/craft-map</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">60</field>
+    </record>
+
+    <record id="website_menu_apply_designer" model="website.menu">
+        <field name="name">Apply as Designer</field>
+        <field name="url">/designer/apply</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">65</field>
+    </record>
+</odoo>

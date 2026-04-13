@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="designer_apply_form" name="Apply as Designer">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="s_text_image pt72 pb72" data-snippet="s_text_image" data-name="Text - Image">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6 pt16 pb16">
+                                <h2>Become a Designer</h2>
+                                <p class="lead text-muted">Join our consignment platform and showcase your unique creations to a wider audience.</p>
+                                <p>Fill out the form below to apply. Our team will review your application and get back to you shortly.</p>
+                                
+                                <form action="/designer/apply/submit" method="post" enctype="multipart/form-data" class="mt-4">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Full Name / Brand Name *</label>
+                                        <input type="text" class="form-control" name="name" id="name" required="required" placeholder="e.g., Artisans of Kutch"/>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="email" class="form-label">Email Address *</label>
+                                            <input type="email" class="form-control" name="email" id="email" required="required" placeholder="contact@example.com"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="phone" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" name="phone" id="phone" placeholder="+91 1234567890"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="designer_type" class="form-label">Designer Type *</label>
+                                            <select class="form-select" name="designer_type" id="designer_type" required="required">
+                                                <option value="individual">Individual Designer</option>
+                                                <option value="shg">Self-Help Group (SHG)</option>
+                                                <option value="ngo">NGO / Trust</option>
+                                                <option value="cooperative">Cooperative</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="designer_specialty" class="form-label">Specialty / Style</label>
+                                            <input type="text" class="form-control" name="designer_specialty" id="designer_specialty" placeholder="e.g., Bridal Couture, Ethnic Wear"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="website_description" class="form-label">Tell us about yourself / Short Bio *</label>
+                                        <textarea class="form-control" name="website_description" id="website_description" rows="4" required="required" placeholder="Describe your craft, your journey, and what makes your creations unique..."></textarea>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <button type="submit" class="btn btn-primary btn-lg w-100">Submit Application</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-lg-6 pt16 pb16 text-center">
+                                <img src="/web/image/website.s_text_image_default_image" class="img img-fluid shadow rounded" alt="Designer Image"/>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <template id="designer_apply_success" name="Application Submitted">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="s_text_block pt104 pb104" data-snippet="s_text_block" data-name="Text">
+                    <div class="container text-center">
+                        <i class="fa fa-4x fa-check-circle text-success mb-3"></i>
+                        <h1 class="display-4">Thank You!</h1>
+                        <p class="lead mb-4">Your application to become a designer has been successfully submitted.</p>
+                        <p class="text-muted">Our team will review your profile and get back to you via email shortly.</p>
+                        <a href="/consignment" class="btn btn-primary mt-3"><i class="fa fa-home border-none me-2"></i>Return to Home</a>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+</odoo>

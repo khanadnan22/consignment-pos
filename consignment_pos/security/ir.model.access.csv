@@ -1,0 +1,18 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_commission_config_admin,commission.config admin,model_commission_config,base.group_system,1,1,1,1
+access_commission_config_user,commission.config user,model_commission_config,base.group_user,1,0,0,0
+access_commission_tier_admin,commission.tier admin,model_commission_tier,base.group_system,1,1,1,1
+access_commission_tier_user,commission.tier user,model_commission_tier,base.group_user,1,0,0,0
+access_settlement_record_admin,settlement.record admin,model_settlement_record,base.group_system,1,1,1,1
+access_settlement_record_user,settlement.record user,model_settlement_record,base.group_user,1,0,0,0
+access_settlement_record_portal,settlement.record portal,model_settlement_record,base.group_portal,1,0,0,0
+access_settlement_wizard_admin,settlement.wizard admin,model_settlement_wizard,base.group_system,1,1,1,1
+access_settlement_dispute_wizard,settlement.dispute.wizard admin,model_settlement_dispute_wizard,base.group_user,1,1,1,1
+access_settlement_dispute_resolve_wizard,settlement.dispute.resolve.wizard admin,model_settlement_dispute_resolve_wizard,base.group_system,1,1,1,1
+access_product_submission_admin,product.submission admin,model_product_submission,base.group_system,1,1,1,1
+access_product_submission_user,product.submission user,model_product_submission,base.group_user,1,1,1,0
+access_product_submission_portal,product.submission portal,model_product_submission,base.group_portal,1,1,1,0
+access_product_submission_reject_wizard,product.submission.reject.wizard,model_product_submission_reject_wizard,base.group_system,1,1,1,1
+access_consignment_dashboard_admin,consignment.dashboard admin,model_consignment_dashboard,base.group_system,1,1,1,1
+access_consignment_dashboard_user,consignment.dashboard user,model_consignment_dashboard,base.group_user,1,0,0,0
+access_craft_region,access_craft_region,model_craft_region,base.group_user,1,1,1,1

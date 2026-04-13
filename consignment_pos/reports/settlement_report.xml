@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report Action -->
+    <record id="action_report_settlement" model="ir.actions.report">
+        <field name="name">Settlement Statement</field>
+        <field name="model">settlement.record</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">consignment_pos.report_settlement_document</field>
+        <field name="report_file">consignment_pos.report_settlement_document</field>
+        <field name="print_report_name">'Settlement_Statement_%s' % (object.designer_id.name)</field>
+        <field name="binding_model_id" ref="model_settlement_record"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_settlement_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="text-center mb-4">
+                            <h2 style="color:#1E2761; font-weight: 800;">Settlement Statement</h2>
+                            <h5>Period: <span t-esc="o.period_start"/> to <span t-esc="o.period_end"/></h5>
+                        </div>
+
+                        <div class="row mt-4 mb-4">
+                            <div class="col-6">
+                                <strong>Prepared For:</strong><br/>
+                                <span style="font-size: 1.2em; font-weight: bold;" t-esc="o.designer_id.name"/><br/>
+                                <span t-esc="o.designer_id.street"/><br/>
+                                <span t-esc="o.designer_id.city"/>
+                            </div>
+                            <div class="col-6 text-end">
+                                <strong>Status:</strong> <span t-esc="o.state.upper()" class="badge text-bg-info"/><br/>
+                                <strong>Date Generated:</strong> <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d')"/><br/>
+                            </div>
+                        </div>
+
+                        <br/>
+                        <table class="table table-sm table-bordered mt-4">
+                            <thead style="background-color: #f8f9fa;">
+                                <tr>
+                                    <th>Sales Channel</th>
+                                    <th class="text-end">Total Gross Sales</th>
+                                    <th class="text-end">Commission Deducted</th>
+                                    <th class="text-end">Net Payout to Designer</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Retail (Point of Sale)</td>
+                                    <td class="text-end"><span t-esc="o.pos_sales" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td class="text-end"><span t-esc="o.pos_sales - o.pos_payout" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td class="text-end"><span t-esc="o.pos_payout" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                                <tr>
+                                    <td>Online (Website)</td>
+                                    <td class="text-end"><span t-esc="o.online_sales" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td class="text-end"><span t-esc="o.online_sales - o.online_payout" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td class="text-end"><span t-esc="o.online_payout" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row mt-4">
+                            <div class="col-7"></div>
+                            <div class="col-5">
+                                <table class="table table-sm table-borderless">
+                                    <tr style="border-top: 2px solid #ddd;">
+                                        <td><strong>Gross Total Sales</strong></td>
+                                        <td class="text-end"><span t-esc="o.total_sales" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total Store Commission</strong></td>
+                                        <td class="text-end"><span t-field="o.commission_amount"/></td>
+                                    </tr>
+                                    <tr style="border-top: 2px solid #000; font-size: 1.3em;">
+                                        <td><strong>Total Final Payout</strong></td>
+                                        <td class="text-end"><strong><span t-field="o.payout_amount" style="color:#166534;"/></strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 text-center text-muted" style="font-size: 0.9em;">
+                            <p>Thank you for partnering with us! Should you have any questions about this settlement, please raise a dispute in your backend portal within 7 days.</p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

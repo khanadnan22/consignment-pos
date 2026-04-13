@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="consignment_pos.OrderlineConsignmentBadge"
+       t-inherit="point_of_sale.Orderline" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('product-name')]" position="after">
+            <t t-if="line.isConsignment()">
+                <div style="font-size:11px;color:#4F7BCC;margin-top:2px;padding:2px 6px;
+                            background:#EEF3FF;border-radius:4px;display:inline-block;">
+                    <span style="font-weight:600;"><t t-esc="line.getDesignerName()"/></span>
+                    <span style="margin-left:6px;color:#6B7280;">
+                        Commission: <t t-esc="line.getCommissionRate()"/>%
+                    </span>
+                    <span style="margin-left:6px;font-weight:600;color:#166534;">
+                        Payout: <t t-esc="line.getDesignerPayout().toFixed(2)"/>
+                    </span>
+                </div>
+            </t>
+        </xpath>
+    </t>
+</templates>

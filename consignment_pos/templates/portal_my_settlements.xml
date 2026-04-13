@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Portal home count badges -->
+    <template id="portal_my_home_consignment" name="Portal: Consignment Settlements"
+              inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+            <t t-set="portal_vendor_category_enable" t-value="True"/>
+        </xpath>
+        <div id="portal_vendor_category" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">My Settlements</t>
+                <t t-set="url" t-value="'/my/settlements'"/>
+                <t t-set="placeholder_count" t-value="'settlement_count'"/>
+                <t t-set="show_count" t-value="True"/>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">My Product Submissions</t>
+                <t t-set="url" t-value="'/my/submissions'"/>
+                <t t-set="placeholder_count" t-value="'submission_count'"/>
+                <t t-set="show_count" t-value="True"/>
+            </t>
+        </div>
+    </template>
+
+    <!-- Settlement List Page -->
+    <template id="portal_my_settlements" name="My Settlements">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Settlements</t>
+            </t>
+            
+            <!-- WOW Factor: Frontend Dashboard Cards -->
+            <t t-set="total_earned" t-value="sum(s.payout_amount for s in settlements if s.state == 'paid')"/>
+            <t t-set="total_pending" t-value="sum(s.payout_amount for s in settlements if s.state in ['posted'])"/>
+            <div class="row mt-4 mb-4">
+                <div class="col-md-4 col-lg-4 mb-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-white">💰 Lifetime Earnings</h5>
+                            <h2 class="display-6 font-weight-bold">
+                                <t t-esc="total_earned" t-options='{"widget":"monetary","display_currency":request.env.company.currency_id}'/>
+                            </h2>
+                            <p class="card-text text-white-50 mt-1">Total payouts successfully completed to your account.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-4 mb-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-white">⏳ Payouts Processing</h5>
+                            <h2 class="display-6 font-weight-bold">
+                                <t t-esc="total_pending" t-options='{"widget":"monetary","display_currency":request.env.company.currency_id}'/>
+                            </h2>
+                            <p class="card-text text-white-50 mt-1">Settlements currently posted and awaiting payment by the store.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-4 mb-3">
+                    <div class="card border-primary h-100">
+                        <div class="card-body text-center d-flex flex-column justify-content-center">
+                            <h5 class="card-title text-primary fw-bold">Got new inventory?</h5>
+                            <p class="card-text text-muted small">Submit items to the store directly from your portal.</p>
+                            <a href="/my/submissions/new" class="btn btn-primary mt-2">
+                                ➕ Submit New Product
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <t t-if="not settlements">
+                <p class="o_portal_sidebar text-muted">No settlements available yet.</p>
+            </t>
+            <t t-if="settlements">
+                <table class="table table-hover o_portal_my_doc_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Period</th>
+                            <th>Total Sales</th>
+                            <th>Commission</th>
+                            <th class="text-success">Payout</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="settlements" t-as="s">
+                            <tr>
+                                <td>
+                                    <a t-attf-href="/my/settlements/{{ s.id }}">
+                                        <t t-esc="s.period_start"/> to <t t-esc="s.period_end"/>
+                                    </a>
+                                </td>
+                                <td><t t-esc="s.total_sales" t-options='{"widget":"monetary","display_currency":s.env.company.currency_id}'/></td>
+                                <td><t t-esc="s.commission_amount" t-options='{"widget":"monetary","display_currency":s.env.company.currency_id}'/></td>
+                                <td class="text-success font-weight-bold">
+                                    <t t-esc="s.payout_amount" t-options='{"widget":"monetary","display_currency":s.env.company.currency_id}'/>
+                                </td>
+                                <td>
+                                    <t t-if="s.state == 'paid'">
+                                        <span class="badge bg-success">Paid</span>
+                                    </t>
+                                    <t t-elif="s.state == 'disputed'">
+                                        <span class="badge bg-warning text-dark">Disputed</span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="badge bg-info">Posted</span>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <t t-call="portal.pager"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Settlement Detail Page -->
+    <template id="portal_settlement_detail" name="Settlement Detail">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4" style="max-width:760px;">
+
+                <!-- Feedback messages -->
+                <t t-if="request.params.get('msg') == 'dispute_sent'">
+                    <div class="alert alert-warning">
+                        Your dispute has been submitted. The store manager will review it shortly.
+                    </div>
+                </t>
+                <t t-if="request.params.get('error') == 'empty_reason'">
+                    <div class="alert alert-danger">
+                        Please provide a reason before submitting a dispute.
+                    </div>
+                </t>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Settlement Statement</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm table-bordered">
+                            <tr><th>Designer</th><td><t t-esc="settlement.designer_id.name"/></td></tr>
+                            <tr>
+                                <th>Period</th>
+                                <td><t t-esc="settlement.period_start"/> to <t t-esc="settlement.period_end"/></td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    <t t-if="settlement.state == 'paid'">
+                                        <span class="badge bg-success">Paid</span>
+                                    </t>
+                                    <t t-elif="settlement.state == 'disputed'">
+                                        <span class="badge bg-warning text-dark">Disputed</span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="badge bg-info">Posted</span>
+                                    </t>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>In-Store Sales (POS)</th>
+                                <td><t t-esc="settlement.pos_sales" t-options='{"widget":"monetary","display_currency":settlement.env.company.currency_id}'/></td>
+                            </tr>
+                            <tr>
+                                <th>Online Sales</th>
+                                <td><t t-esc="settlement.online_sales" t-options='{"widget":"monetary","display_currency":settlement.env.company.currency_id}'/></td>
+                            </tr>
+                            <tr>
+                                <th>Total Sales</th>
+                                <td><t t-esc="settlement.total_sales" t-options='{"widget":"monetary","display_currency":settlement.env.company.currency_id}'/></td>
+                            </tr>
+                            <tr>
+                                <th>Commission Deducted</th>
+                                <td class="text-danger">
+                                    - <t t-esc="settlement.commission_amount" t-options='{"widget":"monetary","display_currency":settlement.env.company.currency_id}'/>
+                                </td>
+                            </tr>
+                            <tr class="table-success">
+                                <th>Net Payout to You</th>
+                                <td class="fw-bold text-success">
+                                    <t t-esc="settlement.payout_amount" t-options='{"widget":"monetary","display_currency":settlement.env.company.currency_id}'/>
+                                </td>
+                            </tr>
+                        </table>
+                        <t t-if="settlement.note">
+                            <p class="text-muted fst-italic mt-3"><t t-esc="settlement.note"/></p>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- Dispute section: only for posted settlements -->
+                <t t-if="settlement.state == 'posted'">
+                    <div class="card border-warning">
+                        <div class="card-header bg-warning text-dark fw-semibold">
+                            Raise a Dispute
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">
+                                If you believe the figures above are incorrect, describe the
+                                discrepancy below and submit a dispute. The store manager
+                                will review and respond.
+                            </p>
+                            <form t-attf-action="/my/settlements/{{ settlement.id }}/dispute"
+                                  method="post">
+                                <input type="hidden" name="csrf_token"
+                                       t-att-value="request.csrf_token()"/>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Reason for Dispute</label>
+                                    <textarea name="dispute_reason" class="form-control" rows="4"
+                                              required="1"
+                                              placeholder="e.g. My online sale of 3 Kasavu Sarees on 15 Mar is not reflected here…"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-warning">
+                                    Submit Dispute
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- Dispute already raised -->
+                <t t-if="settlement.state == 'disputed'">
+                    <div class="card border-warning mt-2">
+                        <div class="card-header bg-warning text-dark fw-semibold">
+                            Dispute Under Review
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Your reason:</strong> <t t-esc="settlement.dispute_reason"/></p>
+                            <t t-if="settlement.dispute_response">
+                                <hr/>
+                                <p><strong>Store response:</strong> <t t-esc="settlement.dispute_response"/></p>
+                            </t>
+                            <t t-else="">
+                                <p class="text-muted">Awaiting store manager review…</p>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+
+                <div class="mt-3">
+                    <a href="/my/settlements" class="btn btn-outline-secondary btn-sm">
+                        ← Back to Settlements
+                    </a>
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+</odoo>

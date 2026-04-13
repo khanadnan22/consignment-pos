@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_settlement" model="ir.actions.report">
+        <field name="name">Settlement Statement</field>
+        <field name="model">settlement.record</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">consignment_pos.report_settlement_document</field>
+        <field name="report_file">consignment_pos.report_settlement_document</field>
+        <field name="binding_model_id" ref="model_settlement_record"/>
+        <field name="binding_type">report</field>
+    </record>
+    <template id="report_settlement_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Consignment Settlement Statement</h2>
+                        <table class="table table-sm table-bordered" style="margin-top:16px;">
+                            <tr><td><b>Designer</b></td><td><t t-esc="doc.designer_id.name"/></td></tr>
+                            <tr><td><b>Period</b></td>
+                                <td><t t-esc="doc.period_start"/> to <t t-esc="doc.period_end"/></td></tr>
+                            <tr><td><b>Status</b></td><td><t t-esc="doc.state.upper()"/></td></tr>
+                        </table>
+                        <table class="table table-bordered" style="margin-top:20px;">
+                            <thead><tr style="background:#1E2761;color:#fff;">
+                                <th>Description</th><th class="text-right">Amount</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr><td>Total Consignment Sales</td>
+                                    <td class="text-right">
+                                        <t t-esc="doc.total_sales" t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td></tr>
+                                <tr><td>Store Commission</td>
+                                    <td class="text-right" style="color:#991B1B;">
+                                        - <t t-esc="doc.commission_amount" t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td></tr>
+                                <tr style="font-weight:bold;">
+                                    <td>Net Payout to Designer</td>
+                                    <td class="text-right" style="color:#166534;">
+                                        <t t-esc="doc.payout_amount" t-options='{"widget":"monetary","display_currency":doc.env.company.currency_id}'/>
+                                    </td></tr>
+                            </tbody>
+                        </table>
+                        <t t-if="doc.move_id">
+                            <p><b>Vendor Bill:</b> <t t-esc="doc.move_id.name"/></p>
+                        </t>
+                        <t t-if="doc.note"><p style="font-style:italic;"><t t-esc="doc.note"/></p></t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

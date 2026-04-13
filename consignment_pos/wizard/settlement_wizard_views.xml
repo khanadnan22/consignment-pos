@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_settlement_wizard_form" model="ir.ui.view">
+        <field name="name">settlement.wizard.form</field>
+        <field name="model">settlement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Settlements">
+                <div class="alert alert-info" role="alert" style="margin-bottom: 15px;">
+                    <strong>What does this do?</strong> <br/>
+                    This wizard permanently scans your database for any <b>unpaid Consignment Sales</b> (from both Point of Sale and your Website) that occurred between the dates you select below.<br/>
+                    It will then automatically calculate the commissions and create <b>new Pending Settlements</b> for each designer.
+                </div>
+                
+                <group string="1. Select Date Range">
+                    <field name="period_start" string="Start Date"/>
+                    <field name="period_end" string="End Date"/>
+                    <field name="designer_id" placeholder="Leave empty to process ALL designers at once" string="Specific Designer"/>
+                </group>
+                
+                <group string="2. Preview (What will be generated)">
+                    <div colspan="2" class="text-muted" style="margin-bottom: 10px;">
+                        <i>The numbers below update automatically based on your dates. These are the items that will be converted into Draft Settlements when you click Generate.</i>
+                    </div>
+                    <group>
+                        <field name="order_count"          readonly="1" string="Unpaid Orders Found"/>
+                        <field name="designer_count"       readonly="1" string="Designers to be Paid"/>
+                    </group>
+                    <group>
+                        <field name="total_sales_preview"  readonly="1" widget="monetary" string="Gross Sales"/>
+                        <field name="total_payout_preview" readonly="1" widget="monetary" style="font-weight: bold; color: #166534;" string="Total Payout Needed"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_generate" type="object"
+                            string="Generate Settlements" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_settlement_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Settlements</field>
+        <field name="res_model">settlement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="menu_settlement_wizard" name="Generate Settlements"
+              parent="menu_consignment_root" action="action_settlement_wizard" sequence="30"/>
+</odoo>

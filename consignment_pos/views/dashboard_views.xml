@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Dashboard Form View — acts as the backend home widget -->
+    <record id="view_consignment_dashboard_form" model="ir.ui.view">
+        <field name="name">consignment.dashboard.form</field>
+        <field name="model">consignment.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Consignment Dashboard" create="false" edit="false" delete="false">
+                <sheet>
+                    <h2 style="color:#1E2761;font-weight:800;margin-bottom:24px;">
+                        📊 Consignment Dashboard
+                    </h2>
+
+                    <!-- Row 1: Settlement KPIs -->
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);
+                                gap:16px;margin-bottom:24px;">
+
+                        <!-- Pending Settlements -->
+                        <div style="background:#EEF3FF;border-radius:12px;padding:20px;
+                                    border-left:4px solid #1E2761;cursor:pointer;"
+                             name="kpi_draft">
+                            <div style="font-size:2rem;font-weight:800;color:#1E2761;">
+                                <field name="total_draft_settlements" readonly="1"/>
+                            </div>
+                            <div style="color:#6B7280;font-size:0.88rem;margin-top:4px;">
+                                Pending Settlements
+                            </div>
+                            <button name="action_view_draft_settlements" type="object"
+                                    string="Review →"
+                                    style="margin-top:10px;background:#1E2761;color:#fff;
+                                           border:none;padding:4px 14px;border-radius:16px;
+                                           font-size:0.8rem;cursor:pointer;"/>
+                        </div>
+
+                        <!-- Awaiting Payment -->
+                        <div style="background:#FFF7ED;border-radius:12px;padding:20px;
+                                    border-left:4px solid #F59E0B;">
+                            <div style="font-size:2rem;font-weight:800;color:#D97706;">
+                                <field name="total_posted_settlements" readonly="1"/>
+                            </div>
+                            <div style="color:#6B7280;font-size:0.88rem;margin-top:4px;">
+                                Awaiting Payment
+                            </div>
+                            <button name="action_view_posted_settlements" type="object"
+                                    string="Pay Now →"
+                                    style="margin-top:10px;background:#D97706;color:#fff;
+                                           border:none;padding:4px 14px;border-radius:16px;
+                                           font-size:0.8rem;cursor:pointer;"/>
+                        </div>
+
+                        <!-- Total Unpaid Payout -->
+                        <div style="background:#F0FDF4;border-radius:12px;padding:20px;
+                                    border-left:4px solid #22C55E;">
+                            <div style="font-size:2rem;font-weight:800;color:#16A34A;">
+                                <field name="total_unpaid_amount" readonly="1"
+                                       widget="monetary"/>
+                            </div>
+                            <div style="color:#6B7280;font-size:0.88rem;margin-top:4px;">
+                                Total Unpaid Payout
+                            </div>
+                        </div>
+
+                        <!-- Overdue Settlements -->
+                        <div style="background:#FFF1F2;border-radius:12px;padding:20px;
+                                    border-left:4px solid #EF4444;">
+                            <div style="font-size:2rem;font-weight:800;color:#DC2626;">
+                                <field name="overdue_settlements" readonly="1"/>
+                            </div>
+                            <div style="color:#6B7280;font-size:0.88rem;margin-top:4px;">
+                                Overdue (&gt;7 days)
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Row 2: This Week + Designers + Stock -->
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);
+                                gap:16px;margin-bottom:24px;">
+
+                        <!-- This Week Sales -->
+                        <div style="background:#F8F9FF;border-radius:12px;padding:20px;
+                                    border:1px solid #E0E7FF;">
+                            <div style="font-size:0.8rem;color:#6B7280;
+                                        text-transform:uppercase;letter-spacing:0.5px;">
+                                This Week — Total Sales
+                            </div>
+                            <div style="font-size:1.6rem;font-weight:800;
+                                        color:#1E2761;margin-top:8px;">
+                                <field name="this_week_sales" readonly="1" widget="monetary"/>
+                            </div>
+                            <div style="font-size:0.85rem;color:#6B7280;margin-top:4px;">
+                                Payout Due:
+                                <field name="this_week_payout" readonly="1"
+                                       widget="monetary"
+                                       style="font-weight:600;color:#166534;"/>
+                            </div>
+                        </div>
+
+                        <!-- Active Designers -->
+                        <div style="background:#F8F9FF;border-radius:12px;padding:20px;
+                                    border:1px solid #E0E7FF;">
+                            <div style="font-size:0.8rem;color:#6B7280;
+                                        text-transform:uppercase;letter-spacing:0.5px;">
+                                Active Designers (90 days)
+                            </div>
+                            <div style="font-size:1.6rem;font-weight:800;
+                                        color:#1E2761;margin-top:8px;">
+                                <field name="total_designers_active" readonly="1"/>
+                            </div>
+                        </div>
+
+                        <!-- Low Stock -->
+                        <div style="background:#FFF7ED;border-radius:12px;padding:20px;
+                                    border:1px solid #FED7AA;">
+                            <div style="font-size:0.8rem;color:#6B7280;
+                                        text-transform:uppercase;letter-spacing:0.5px;">
+                                Low Stock Products
+                            </div>
+                            <div style="font-size:1.6rem;font-weight:800;
+                                        color:#D97706;margin-top:8px;">
+                                <field name="low_stock_products" readonly="1"/>
+                            </div>
+                            <button name="action_view_low_stock" type="object"
+                                    string="View →"
+                                    style="margin-top:8px;background:#D97706;color:#fff;
+                                           border:none;padding:4px 14px;border-radius:16px;
+                                           font-size:0.8rem;cursor:pointer;"/>
+                        </div>
+
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div style="background:#F8F9FF;border-radius:12px;padding:20px;
+                                border:1px solid #E0E7FF;">
+                        <div style="font-weight:700;color:#1E2761;margin-bottom:14px;">
+                            Quick Actions
+                        </div>
+                        <button name="action_generate_settlements" type="object"
+                                string="⚙️  Generate Settlements" class="btn-primary"
+                                style="margin-right:10px;"/>
+                        <button name="action_view_draft_settlements" type="object"
+                                string="📋  Review Pending" class="btn-secondary"
+                                style="margin-right:10px;"/>
+                        <button name="action_view_posted_settlements" type="object"
+                                string="💰  Process Payments" class="btn-secondary"/>
+                    </div>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="action_consignment_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard</field>
+        <field name="res_model">consignment.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Dashboard as first menu item -->
+    <menuitem id="menu_consignment_dashboard" name="Dashboard"
+              parent="menu_consignment_root"
+              action="action_consignment_dashboard" sequence="5"/>
+
+</odoo>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Commission Config Form -->
+    <record id="view_commission_config_form" model="ir.ui.view">
+        <field name="name">commission.config.form</field>
+        <field name="model">commission.config</field>
+        <field name="arch" type="xml">
+            <form string="Commission Configuration">
+                <sheet>
+                    <group>
+                        <group string="Designer">
+                            <field name="designer_id"/>
+                            <field name="commission_percentage"/>
+                            <field name="settlement_period"/>
+                        </group>
+                        <group string="Validity Period">
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Commission Config List — Odoo 19 uses <list> instead of <tree> -->
+    <record id="view_commission_config_list" model="ir.ui.view">
+        <field name="name">commission.config.list</field>
+        <field name="model">commission.config</field>
+        <field name="arch" type="xml">
+            <list string="Commission Configurations" editable="bottom">
+                <field name="designer_id"/>
+                <field name="commission_percentage"/>
+                <field name="settlement_period"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_commission_config" model="ir.actions.act_window">
+        <field name="name">Commission Configuration</field>
+        <field name="res_model">commission.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_commission_config"
+              name="Commission Config"
+              parent="menu_consignment_root"
+              action="action_commission_config"
+              sequence="20"/>
+
+</odoo>
